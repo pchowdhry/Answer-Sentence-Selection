@@ -1,5 +1,5 @@
 import os
-os.environ["THEANO_FLAGS"] = "device=gpu1,floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
+os.environ["THEANO_FLAGS"] = "device=gpu0,floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
 
 import numpy as np
 np.random.seed(1000)
@@ -710,7 +710,7 @@ def run_test():
 if __name__=="__main__":
 
     model_name = sys.argv[1]
-    data_folder = os.path.join("/data")
+    data_folder = os.path.join("data")
     word_vec_file = os.path.join(data_folder, sys.argv[2])
     stop_words_file = os.path.join(data_folder, sys.argv[3])
     train_file = os.path.join(data_folder, sys.argv[4])
