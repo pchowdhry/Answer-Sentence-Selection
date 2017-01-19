@@ -673,11 +673,11 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
 
     dev_probs = best_wang_model.predict([dev_q_tensor, dev_a_tensor], batch_size=batch_size)
 
-    reg_train_data_np = get_lr_data(train_samples, train_probs)
+    #reg_train_data_np = get_lr_data(train_samples, train_probs)
 
-    reg_dev_data_np = get_lr_data(dev_samples, dev_probs)
+    #reg_dev_data_np = get_lr_data(dev_samples, dev_probs)
 
-    reg_test_data_np = get_lr_data(test_samples, test_probs)
+    #reg_test_data_np = get_lr_data(test_samples, test_probs)
 
     #LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
     #                                                        train_labels_np, dev_ref_lines, test_ref_lines)
