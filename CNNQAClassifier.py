@@ -654,7 +654,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     best_wang_model_file = os.path.join(data_folder, "best_wang_cnn_model.h5")
 
     for epoch_count in range(0, epoch):
-
+        print epoch_count
         wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=1,
                   batch_size=batch_size, verbose=2)
         dev_probs = wang_model.predict([dev_q_tensor, dev_a_tensor], batch_size=batch_size)
@@ -679,10 +679,11 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
 
     reg_test_data_np = get_lr_data(test_samples, test_probs)
 
-    LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
-                                                            train_labels_np, dev_ref_lines, test_ref_lines)
-    return MAP, MRR, LR_Dense_MAP, LR_Dense_MRR
+    #LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
+    #                                                        train_labels_np, dev_ref_lines, test_ref_lines)
+    #return MAP, MRR, LR_Dense_MAP, LR_Dense_MRR
 
+    return MAP, MRR
 def run_test():
     batch_size = 10
     word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
