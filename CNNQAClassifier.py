@@ -649,7 +649,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
 
 
     batch_size = 10
-    epoch = 1
+    epoch = 10
     best_MAP = -10.0
     best_wang_model_file = os.path.join(data_folder, "best_wang_cnn_model.h5")
 
@@ -729,7 +729,6 @@ if __name__=="__main__":
     files.append(train_file)
     files.append(dev_file)
     files.append(test_file)
-    #idf=build_idf(files)
 
     train_samples = load_samples(train_file)
     dev_samples=load_samples(dev_file)
@@ -776,9 +775,6 @@ if __name__=="__main__":
         print "Decomp Comp CNN"
         print "MAP:", MAP
         print "MRR:", MRR
-        #print "Decomp Comp CNN with Features"
-        #print "MAP:", LR_Dense_MAP
-        #print "MRR:", LR_Dense_MRR
 
 
 
