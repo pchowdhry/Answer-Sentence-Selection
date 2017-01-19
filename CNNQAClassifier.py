@@ -728,7 +728,7 @@ if __name__=="__main__":
     files.append(train_file)
     files.append(dev_file)
     files.append(test_file)
-    idf=build_idf(files)
+    #idf=build_idf(files)
 
     train_samples = load_samples(train_file)
     dev_samples=load_samples(dev_file)
