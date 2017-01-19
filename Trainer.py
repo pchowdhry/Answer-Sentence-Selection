@@ -649,7 +649,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
                   optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0), metrics=['accuracy'])
 
 
-    batch_size = 10
+    batch_size = 100
     epoch = 10
     best_MAP = -10.0
     best_wang_model_file = os.path.join(data_folder, "best_wang_cnn_model.h5")
