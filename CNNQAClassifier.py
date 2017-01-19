@@ -776,9 +776,9 @@ if __name__=="__main__":
         print "Decomp Comp CNN"
         print "MAP:", MAP
         print "MRR:", MRR
-        print "Decomp Comp CNN with Features"
-        print "MAP:", LR_Dense_MAP
-        print "MRR:", LR_Dense_MRR
+        #print "Decomp Comp CNN with Features"
+        #print "MAP:", LR_Dense_MAP
+        #print "MRR:", LR_Dense_MRR
 
 
 
