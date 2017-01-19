@@ -772,7 +772,7 @@ if __name__=="__main__":
     elif model_name=="DecompCompCNN":
         #Decomposition and Composition based CNN model
         print "Decomposition and Composition based CNN model started......"
-        MAP, MRR, LR_Dense_MAP, LR_Dense_MRR = run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
+        MAP, MRR = run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
         print "Decomp Comp CNN"
         print "MAP:", MAP
         print "MRR:", MRR
