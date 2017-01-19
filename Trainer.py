@@ -10,6 +10,7 @@ from keras.layers import Dense, Activation, Input, merge, Lambda
 from keras.layers.convolutional import Convolution1D
 from keras.optimizers import Adam
 from keras.layers.pooling import AveragePooling1D, MaxPooling1D
+import keras
 import sys
 import re
 import Score
@@ -653,63 +654,13 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     best_MAP = -10.0
     best_wang_model_file = os.path.join(data_folder, "best_wang_cnn_model.h5")
 
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{acc:.2f}.hdf5', monitor='acc', verbose=0,
+                                                 save_best_only=True, save_weights_only=False, mode='auto')
+
     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=epoch,
-                   batch_size=batch_size, verbose=2, validation_split=0.30, shuffle=True)
+                   batch_size=batch_size, verbose=2, validation_split=0.30, shuffle=True, callbacks=[checkpoint])
 
-    # for epoch_count in range(0, epoch):
-    #     print epoch_count
-    #     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=1,
-    #               batch_size=batch_size, verbose=2)
-    #     dev_probs = wang_model.predict([dev_q_tensor, dev_a_tensor], batch_size=batch_size)
-    #     MAP, MRR = cal_score(dev_ref_lines, dev_probs)
-    #     if MAP > best_MAP:
-    #         best_MAP = MAP
-    #         wang_model.save(best_wang_model_file)
-    #
-    # best_wang_model = load_model(best_wang_model_file)
-    #
-    # test_probs = best_wang_model.predict([test_q_tensor, test_a_tensor], batch_size=batch_size)
-    #
-    # MAP, MRR = cal_score(test_ref_lines, test_probs)
-    #
-    # train_probs = best_wang_model.predict([train_q_tensor, train_a_tensor], batch_size=batch_size)
-    #
-    # dev_probs = best_wang_model.predict([dev_q_tensor, dev_a_tensor], batch_size=batch_size)
-    #
-    # #reg_train_data_np = get_lr_data(train_samples, train_probs)
-    #
-    # #reg_dev_data_np = get_lr_data(dev_samples, dev_probs)
-    #
-    # #reg_test_data_np = get_lr_data(test_samples, test_probs)
-    #
-    # #LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
-    # #                                                        train_labels_np, dev_ref_lines, test_ref_lines)
-    # #return MAP, MRR, LR_Dense_MAP, LR_Dense_MRR
-    #
-    # return MAP, MRR
-def run_test():
-    batch_size = 10
-    word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
-    best_wang_model_file = 'data/best_wang_cnn_model.h5'
-    word_vecs = load_word2vec(word_vec_file)
-    test_file = 'data/WikiQASent-test-filtered.txt'
-    test_ref_file = 'data/WikiQASent-test-filtered.ref'
-    test_samples = load_samples(test_file)
-    max_qs_l, max_ans_l = get_max_len(load_samples('data/WikiQASent-train.txt'),
-                                      load_samples('data/WikiQASent-dev-filtered.txt'), test_samples)
-    if max_ans_l > ans_len_cut_off:
-        max_ans_l = ans_len_cut_off
-    test_samples_sent_matrix, test_labels = get_wang_model_input(test_samples, max_qs_l, max_ans_l)
-    test_q_tensor, test_a_tensor = get_wang_conv_model_input(test_samples_sent_matrix, max_qs_l, max_ans_l)
-    best_wang_model = load_model(best_wang_model_file)
 
-    test_probs = best_wang_model.predict([test_q_tensor, test_a_tensor], batch_size=batch_size)
-
-    file_reader=open(test_ref_file)
-    test_ref_lines=file_reader.readlines()
-    MAP, MRR = cal_score(test_ref_lines, test_probs)
-    print MAP
-    print MRR
 
 if __name__=="__main__":
 
@@ -775,9 +726,6 @@ if __name__=="__main__":
         #Decomposition and Composition based CNN model
         print "Decomposition and Composition based CNN model started......"
         MAP, MRR = run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
-        print "Decomp Comp CNN"
-        print "MAP:", MAP
-        print "MRR:", MRR
 
 
 
