@@ -286,7 +286,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     wang_model.compile(loss={'labels': 'binary_crossentropy'},
                   optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0), metrics=['accuracy'])
 
-    batch_size = 1
+    batch_size = 100
     epoch = 10
 
     checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{acc:.2f}.hdf5', monitor='acc',
