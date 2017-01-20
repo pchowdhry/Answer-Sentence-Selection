@@ -314,20 +314,20 @@ if __name__=="__main__":
 
     files=[]
     files.append(train_file)
-    #files.append(dev_file)
-    #files.append(test_file)
+    files.append(dev_file)
+    files.append(test_file)
 
     train_samples = load_samples(train_file)
-    #dev_samples=load_samples(dev_file)
-    #test_samples = load_samples(test_file)
+    dev_samples=load_samples(dev_file)
+    test_samples = load_samples(test_file)
 
-    #file_reader = open(dev_ref_file)
-    #dev_ref_lines = file_reader.readlines()
-    #file_reader.close()
+    file_reader = open(dev_ref_file)
+    dev_ref_lines = file_reader.readlines()
+    file_reader.close()
 
-    #file_reader=open(test_ref_file)
-    #test_ref_lines=file_reader.readlines()
-    #file_reader.close()
+    file_reader=open(test_ref_file)
+    test_ref_lines=file_reader.readlines()
+    file_reader.close()
 
 
     if model_name=="DecompCompCNN":
