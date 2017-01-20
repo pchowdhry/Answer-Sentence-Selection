@@ -246,14 +246,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
         max_ans_l = ans_len_cut_off
     train_samples_sent_matrix, train_labels = get_wang_model_input(train_samples, max_qs_l, max_ans_l)
     train_labels_np=np.array(train_labels)
-    #dev_samples_sent_matrix, dev_labels = get_wang_model_input(dev_samples, max_qs_l, max_ans_l)
-    #dev_labels_np = np.array(dev_labels)
-    #test_samples_sent_matrix, test_labels = get_wang_model_input(test_samples, max_qs_l, max_ans_l)
-    #test_labels_np = np.array(test_labels)
-
     train_q_tensor, train_a_tensor = get_wang_conv_model_input(train_samples_sent_matrix, max_qs_l, max_ans_l)
-    #dev_q_tensor, dev_a_tensor = get_wang_conv_model_input(dev_samples_sent_matrix, max_qs_l, max_ans_l)
-    #test_q_tensor, test_a_tensor = get_wang_conv_model_input(test_samples_sent_matrix, max_qs_l, max_ans_l)
     max_qs_l = 2 * max_qs_l + 2
     max_ans_l = 2 * max_ans_l + 2
     Reduce = Lambda(lambda x: x[:, 0, :], output_shape=lambda shape: (shape[0], shape[-1]))
@@ -321,20 +314,20 @@ if __name__=="__main__":
 
     files=[]
     files.append(train_file)
-    files.append(dev_file)
-    files.append(test_file)
+    #files.append(dev_file)
+    #files.append(test_file)
 
     train_samples = load_samples(train_file)
-    dev_samples=load_samples(dev_file)
-    test_samples = load_samples(test_file)
+    #dev_samples=load_samples(dev_file)
+    #test_samples = load_samples(test_file)
 
-    file_reader = open(dev_ref_file)
-    dev_ref_lines = file_reader.readlines()
-    file_reader.close()
+    #file_reader = open(dev_ref_file)
+    #dev_ref_lines = file_reader.readlines()
+    #file_reader.close()
 
-    file_reader=open(test_ref_file)
-    test_ref_lines=file_reader.readlines()
-    file_reader.close()
+    #file_reader=open(test_ref_file)
+    #test_ref_lines=file_reader.readlines()
+    #file_reader.close()
 
 
     if model_name=="DecompCompCNN":
