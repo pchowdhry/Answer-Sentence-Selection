@@ -293,7 +293,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
                                                  save_best_only=True, save_weights_only=False, mode='auto', verbose=2)
 
     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=epoch,
-                   batch_size=batch_size, verbose=2, validation_split=0.30, callbacks=[checkpoint])
+                   batch_size=batch_size, verbose=2, validation_split=0.20, shuffle='True', callbacks=[checkpoint])
 
 if __name__=="__main__":
 
