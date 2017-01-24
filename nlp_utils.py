@@ -77,4 +77,4 @@ def clean_string(t):
     return t
 
 if __name__ == '__main__':
-    app.run(host= '0.0.0.0')
+    app.run(host= '0.0.0.0',port=8080, threaded=True)
