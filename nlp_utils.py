@@ -76,4 +76,4 @@ def clean_string(t):
     return t
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host= '0.0.0.0')
