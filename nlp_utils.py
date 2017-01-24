@@ -39,7 +39,7 @@ def get_text():
    return json.dumps(tt)
 
 @app.route('/generate_kb')
-def generate_kb(kb_name, url):
+def generate_kb():
    url = request.args.get('target')
    kb_name = request.args.get('kb_name')
    page = requests.get(url)
@@ -67,9 +67,6 @@ def generate_kb(kb_name, url):
            thefile.write('\n')
        thefile.close
    return json.dumps(tt)
-
-
-
 
 @app.route('/get_text_from_pdf')
 def get_from_pdf():

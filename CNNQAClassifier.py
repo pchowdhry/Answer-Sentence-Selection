@@ -107,8 +107,6 @@ def parse_entry(qset):
         samples.append(sample)
     return samples
 
-
-
 def load_stop_words(stop_file):
     file_reader=open(stop_file)
     lines=file_reader.readlines()
