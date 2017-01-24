@@ -1,6 +1,6 @@
 import os
-os.environ["THEANO_FLAGS"] = "device=gpu0,floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
-#os.environ["THEANO_FLAGS"] = "floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
+#os.environ["THEANO_FLAGS"] = "device=gpu0,floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
+os.environ["THEANO_FLAGS"] = "floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
 
 
 import numpy as np
@@ -24,6 +24,8 @@ from keras.models import load_model
 vec_dim=300
 sent_vec_dim=300
 ans_len_cut_off=40
+max_qs_l = 23
+max_ans_l = 40
 word_vecs = {}
 stop_words=[]
 idf = defaultdict(float)
@@ -101,34 +103,34 @@ def load_stop_words(stop_file):
         stop_words.append(line)
     return stop_words
 
-def get_max_len(train_samples,dev_samples,test_samples):
-     max_qs_l = len(train_samples[0].QsWords)
-     for i in range(1, len(train_samples)):
-         if len(train_samples[i].QsWords) > max_qs_l:
-             max_qs_l = len(train_samples[i].QsWords)
-
-     for i in range(0, len(dev_samples)):
-         if len(dev_samples[i].QsWords) > max_qs_l:
-             max_qs_l = len(dev_samples[i].QsWords)
-
-     for i in range(0, len(test_samples)):
-         if len(test_samples[i].QsWords) > max_qs_l:
-             max_qs_l = len(test_samples[i].QsWords)
-
-     max_ans_l = len(train_samples[0].AnsWords)
-     for i in range(1, len(train_samples)):
-         if len(train_samples[i].AnsWords) > max_ans_l:
-             max_ans_l = len(train_samples[i].AnsWords)
-
-     for i in range(0, len(dev_samples)):
-         if len(dev_samples[i].AnsWords) > max_ans_l:
-             max_ans_l = len(dev_samples[i].AnsWords)
-
-     for i in range(0, len(test_samples)):
-         if len(test_samples[i].AnsWords) > max_ans_l:
-             max_ans_l = len(test_samples[i].AnsWords)
-     return max_qs_l, max_ans_l
-
+#def get_max_len(train_samples,dev_samples,test_samples):
+#     max_qs_l = len(train_samples[0].QsWords)
+#     for i in range(1, len(train_samples)):
+#         if len(train_samples[i].QsWords) > max_qs_l:
+#             max_qs_l = len(train_samples[i].QsWords)
+#
+#     for i in range(0, len(dev_samples)):
+#         if len(dev_samples[i].QsWords) > max_qs_l:
+#             max_qs_l = len(dev_samples[i].QsWords)
+#
+#     for i in range(0, len(test_samples)):
+#         if len(test_samples[i].QsWords) > max_qs_l:
+#             max_qs_l = len(test_samples[i].QsWords)
+#
+#     max_ans_l = len(train_samples[0].AnsWords)
+#     for i in range(1, len(train_samples)):
+#         if len(train_samples[i].AnsWords) > max_ans_l:
+#             max_ans_l = len(train_samples[i].AnsWords)
+#
+#     for i in range(0, len(dev_samples)):
+#         if len(dev_samples[i].AnsWords) > max_ans_l:
+#             max_ans_l = len(dev_samples[i].AnsWords)
+#
+#     for i in range(0, len(test_samples)):
+#         if len(test_samples[i].AnsWords) > max_ans_l:
+#             max_ans_l = len(test_samples[i].AnsWords)
+#     return max_qs_l, max_ans_l
+#
 # Implementation of Wang model
 
 def compose_decompose(qmatrix, amatrix):
@@ -136,7 +138,6 @@ def compose_decompose(qmatrix, amatrix):
     qplus, qminus = f_decompose(qmatrix, qhatmatrix)
     aplus, aminus = f_decompose(amatrix, ahatmatrix)
     return qplus, qminus, aplus, aminus
-
 
 def f_match(qmatrix, amatrix, window_size=3):
     A = 1 - cdist(qmatrix, amatrix, metric='cosine')  # Similarity matrix
@@ -167,7 +168,6 @@ def f_match(qmatrix, amatrix, window_size=3):
                            ((aword_idx, qword_indices), (weight_sum, weights)) in
                            zip(enumerate(aq_window), aq_weights)])
     return qhatmatrix, ahatmatrix
-
 
 def f_decompose(matrix, hatmatrix):
     # finding magnitude of parallel vector
@@ -240,7 +240,7 @@ def get_sent_matrix(words):
     return np.array(vecs)
 
 def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines):
-    max_qs_l, max_ans_l = get_max_len(train_samples, dev_samples, test_samples)
+    max_qs_l, max_ans_l = 23,40
 
     if max_ans_l > ans_len_cut_off:
         max_ans_l = ans_len_cut_off
@@ -286,14 +286,14 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     wang_model.compile(loss={'labels': 'binary_crossentropy'},
                   optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0), metrics=['accuracy'])
 
-    batch_size = 100
-    epoch = 10
+    batch_size = 10
+    epoch = 25
 
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{acc:.2f}.hdf5', monitor='acc',
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{val_acc:.2f}.hdf5', monitor='val_acc',
                                                  save_best_only=True, save_weights_only=False, mode='auto', verbose=2)
 
     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=epoch,
-                   batch_size=batch_size, verbose=2, validation_split=0.30, callbacks=[checkpoint])
+                   batch_size=batch_size, verbose=2, validation_split=0.30, shuffle='True', callbacks=[checkpoint])
 
 if __name__=="__main__":
 
@@ -333,7 +333,7 @@ if __name__=="__main__":
     if model_name=="DecompCompCNN":
         #Decomposition and Composition based CNN model
         print "Decomposition and Composition based CNN model started......"
-        MAP, MRR = run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
+        run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
 
 
 

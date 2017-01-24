@@ -91,6 +91,23 @@ def load_samples(file):
         samples.append(sample)
     return samples
 
+def parse_entry(qset):
+    samples = []
+    for e in qset:
+        parts = e
+        qs = parts[0]
+        qs=qs.replace('\n','')
+        ans = parts[1]
+        ans=ans.replace('\n','')
+        qwords = qs.split()
+        answords = ans.split()
+        label = int(parts[2].replace('\n', ''))
+        sample = QASample(Qs=qs, Ans=ans, QsWords=qwords, AnsWords=answords, Label=label)
+        samples.append(sample)
+    return samples
+
+
+
 def load_stop_words(stop_file):
     file_reader=open(stop_file)
     lines=file_reader.readlines()
@@ -490,7 +507,6 @@ def compose_decompose(qmatrix, amatrix):
     aplus, aminus = f_decompose(amatrix, ahatmatrix)
     return qplus, qminus, aplus, aminus
 
-
 def f_match(qmatrix, amatrix, window_size=3):
     A = 1 - cdist(qmatrix, amatrix, metric='cosine')  # Similarity matrix
     Atranspose = np.transpose(A)
@@ -520,7 +536,6 @@ def f_match(qmatrix, amatrix, window_size=3):
                            ((aword_idx, qword_indices), (weight_sum, weights)) in
                            zip(enumerate(aq_window), aq_weights)])
     return qhatmatrix, ahatmatrix
-
 
 def f_decompose(matrix, hatmatrix):
     # finding magnitude of parallel vector
@@ -674,40 +689,17 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
 
     dev_probs = best_wang_model.predict([dev_q_tensor, dev_a_tensor], batch_size=batch_size)
 
-    #reg_train_data_np = get_lr_data(train_samples, train_probs)
+    reg_train_data_np = get_lr_data(train_samples, train_probs)
 
-    #reg_dev_data_np = get_lr_data(dev_samples, dev_probs)
+    reg_dev_data_np = get_lr_data(dev_samples, dev_probs)
 
-    #reg_test_data_np = get_lr_data(test_samples, test_probs)
+    reg_test_data_np = get_lr_data(test_samples, test_probs)
 
-    #LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
-    #                                                        train_labels_np, dev_ref_lines, test_ref_lines)
-    #return MAP, MRR, LR_Dense_MAP, LR_Dense_MRR
+    LR_Dense_MAP, LR_Dense_MRR = train_lr_using_dense_layer(reg_train_data_np, reg_dev_data_np, reg_test_data_np,
+                                                            train_labels_np, dev_ref_lines, test_ref_lines)
+    return MAP, MRR, LR_Dense_MAP, LR_Dense_MRR
 
     return MAP, MRR
-def run_test():
-    batch_size = 10
-    word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
-    best_wang_model_file = 'data/best_wang_cnn_model.h5'
-    word_vecs = load_word2vec(word_vec_file)
-    test_file = 'data/WikiQASent-test-filtered.txt'
-    test_ref_file = 'data/WikiQASent-test-filtered.ref'
-    test_samples = load_samples(test_file)
-    max_qs_l, max_ans_l = get_max_len(load_samples('data/WikiQASent-train.txt'),
-                                      load_samples('data/WikiQASent-dev-filtered.txt'), test_samples)
-    if max_ans_l > ans_len_cut_off:
-        max_ans_l = ans_len_cut_off
-    test_samples_sent_matrix, test_labels = get_wang_model_input(test_samples, max_qs_l, max_ans_l)
-    test_q_tensor, test_a_tensor = get_wang_conv_model_input(test_samples_sent_matrix, max_qs_l, max_ans_l)
-    best_wang_model = load_model(best_wang_model_file)
-
-    test_probs = best_wang_model.predict([test_q_tensor, test_a_tensor], batch_size=batch_size)
-
-    file_reader=open(test_ref_file)
-    test_ref_lines=file_reader.readlines()
-    MAP, MRR = cal_score(test_ref_lines, test_probs)
-    print MAP
-    print MRR
 
 if __name__=="__main__":
 
