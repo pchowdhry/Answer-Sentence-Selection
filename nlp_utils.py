@@ -64,9 +64,10 @@ def tokenize_texts(texts):
 
 @app.route('/answers')
 def get_answers():
-    print(datetime.datetime.now())
-    answers = Iscore.dynamic_score('wells.txt', 'What happens after the draw period')
-    return answers
+    question = request.args.get('question')
+    file = request.args.get('file')
+    answers = Iscore.dynamic_score(file, question)
+    return json.dumps(answers)
 
 
 def clean_string(t):

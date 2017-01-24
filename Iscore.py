@@ -54,7 +54,9 @@ def dynamic_score(file_name,question):
     max_ans_l = 40
     test_samples_sent_matrix, test_labels = get_wang_model_input(test_samples, max_qs_l, max_ans_l)
     test_q_tensor, test_a_tensor = get_wang_conv_model_input(test_samples_sent_matrix, max_qs_l, max_ans_l)
+    print(datetime.datetime.now())
     test_probs = best_wang_model.predict([test_q_tensor, test_a_tensor], batch_size=batch_size)
+    print(datetime.datetime.now())
     zipped = zip(test_probs, qset)
     s = sorted(zipped, key=lambda ranked: ranked[0], reverse=True)
     sorted_answers = []
@@ -63,4 +65,4 @@ def dynamic_score(file_name,question):
     for i in range(0, top):
         print s[i][0][0], s[i][1][1]
         sorted_answers.append([str(s[i][0][0]), s[i][1][1]])
-    return json.dumps(sorted_answers)
+    return sorted_answers
