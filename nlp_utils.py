@@ -12,8 +12,9 @@ import json
 import os
 import sys
 import PyPDF2
-import Iscore
 from bs4 import BeautifulSoup
+import Iscore
+
 nlp = English()
 
 app = Flask(__name__)
@@ -36,6 +37,39 @@ def get_text():
            #t.sub(r'\.([a-zA-Z])', r'. \1', t)
            tt.append(t)
    return json.dumps(tt)
+
+@app.route('/generate_kb')
+def generate_kb(kb_name, url):
+   url = request.args.get('target')
+   kb_name = request.args.get('kb_name')
+   page = requests.get(url)
+   page = BeautifulSoup(page.content, 'html.parser')
+   for script in page.find_all("script"):
+    script.decompose()
+    text = tokenize_texts(page.get_text())
+   tt = []
+   s = 'menu'
+   for t in text:
+       if t.endswith('.') and s not in t:
+           t = t.replace('\n', ' ')
+           t = t.replace(':', ' ')
+           t = t.replace('.', '')
+           t = t.replace(',', '')
+           t = t.replace('(', '')
+           t = t.replace(')', '')
+           t = t.replace('-', ' ')
+           t = re.sub( '\s+', ' ', t ).strip()
+           #t.sub(r'\.([a-zA-Z])', r'. \1', t)
+           tt.append(t)
+       thefile = open("%s.txt" % kb_name, 'w' )
+       for item in tt:
+           thefile.write(item.encode('utf-8').strip())
+           thefile.write('\n')
+       thefile.close
+   return json.dumps(tt)
+
+
+
 
 @app.route('/get_text_from_pdf')
 def get_from_pdf():
