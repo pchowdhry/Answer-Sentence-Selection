@@ -603,6 +603,7 @@ def get_sent_matrix(words):
         if word_vecs.has_key(word):
             vec = word_vecs[word]
         else:
+            print(word)
             vec = word_vecs["<unk>"]
         vecs.append(np.array(vec))
     return np.array(vecs)
