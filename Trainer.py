@@ -289,7 +289,7 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     batch_size = 10
     epoch = 25
 
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{val_acc:.2f}.hdf5', monitor='val_acc',
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{acc:.2f}.hdf5', monitor='acc',
                                                  save_best_only=True, save_weights_only=False, mode='auto', verbose=2)
 
     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=epoch,
