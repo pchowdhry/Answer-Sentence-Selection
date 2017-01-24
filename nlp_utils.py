@@ -4,6 +4,7 @@ from flask import Flask
 from flask import request
 from spacy.en import English
 from io import BytesIO
+import datetime
 #import html
 import requests
 import re
@@ -13,9 +14,9 @@ import sys
 import PyPDF2
 import Iscore
 from bs4 import BeautifulSoup
+nlp = English()
 
 app = Flask(__name__)
-nlp = English()
 
 @app.route('/get_text')
 def get_text():
@@ -63,8 +64,8 @@ def tokenize_texts(texts):
 
 @app.route('/answers')
 def get_answers():
+    print(datetime.datetime.now())
     answers = Iscore.dynamic_score('wells.txt', 'What happens after the draw period')
-
     return answers
 
 

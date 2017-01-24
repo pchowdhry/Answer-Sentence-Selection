@@ -7,6 +7,7 @@ word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
 best_wang_model_file = 'checkpoint-21-0.83.hdf5'
 word_vecs = load_word2vec(word_vec_file)
 best_wang_model = load_model(best_wang_model_file)
+import datetime
 max_qs_l = 23
 max_ans_l = 40
 
@@ -41,6 +42,7 @@ def run_test():
     print s[0][0][0], s[0][1][1]
 
 def dynamic_score(file_name,question):
+    print(datetime.datetime.now())
     raw_base = load_sentences_from_file(file_name)
     q = question
     kb = raw_base
