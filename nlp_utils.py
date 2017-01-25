@@ -59,8 +59,10 @@ def generate_kb():
            t = t.replace(')', '')
            t = t.replace('-', ' ')
            t = re.sub( '\s+', ' ', t ).strip()
+           t = re.sub('[^A-Za-z0-9]+', ' ', t)
            #t.sub(r'\.([a-zA-Z])', r'. \1', t)
-           tt.append(t)
+           if len(t) > 1:
+               tt.append(t)
        thefile = open("%s.txt" % kb_name, 'w' )
        for item in tt:
            thefile.write(item.encode('utf-8').strip())
