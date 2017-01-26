@@ -239,11 +239,12 @@ def get_sent_matrix(words):
         vecs.append(np.array(vec))
     return np.array(vecs)
 
-def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines):
+def run_wang_cnn_model(train_samples):
     max_qs_l, max_ans_l = 23,40
 
     if max_ans_l > ans_len_cut_off:
         max_ans_l = ans_len_cut_off
+
     train_samples_sent_matrix, train_labels = get_wang_model_input(train_samples, max_qs_l, max_ans_l)
     train_labels_np=np.array(train_labels)
     train_q_tensor, train_a_tensor = get_wang_conv_model_input(train_samples_sent_matrix, max_qs_l, max_ans_l)
@@ -289,11 +290,11 @@ def run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, 
     batch_size = 10
     epoch = 25
 
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{acc:.2f}.hdf5', monitor='acc',
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath='checkpoint-{epoch:02d}-{val_acc:.2f}.hdf5', monitor='val_acc',
                                                  save_best_only=True, save_weights_only=False, mode='auto', verbose=2)
 
     wang_model.fit({'qs_input': train_q_tensor, 'ans_input': train_a_tensor}, {'labels': train_labels_np}, nb_epoch=epoch,
-                   batch_size=batch_size, verbose=2, validation_split=0.30, shuffle='True', callbacks=[checkpoint])
+                   batch_size=batch_size, verbose=2, validation_split=0.50, shuffle='True', callbacks=[checkpoint])
 
 if __name__=="__main__":
 
@@ -302,10 +303,7 @@ if __name__=="__main__":
     word_vec_file = os.path.join(data_folder, sys.argv[2])
     stop_words_file = os.path.join(data_folder, sys.argv[3])
     train_file = os.path.join(data_folder, sys.argv[4])
-    dev_file = os.path.join(data_folder, sys.argv[5])
-    dev_ref_file = os.path.join(data_folder, sys.argv[6])
-    test_file = os.path.join(data_folder, sys.argv[7])
-    test_ref_file = os.path.join(data_folder, sys.argv[8])
+
 
     QASample=namedtuple("QASample","Qs Ans QsWords AnsWords Label")
 
@@ -314,26 +312,12 @@ if __name__=="__main__":
 
     files=[]
     files.append(train_file)
-    files.append(dev_file)
-    files.append(test_file)
-
     train_samples = load_samples(train_file)
-    dev_samples=load_samples(dev_file)
-    test_samples = load_samples(test_file)
-
-    file_reader = open(dev_ref_file)
-    dev_ref_lines = file_reader.readlines()
-    file_reader.close()
-
-    file_reader=open(test_ref_file)
-    test_ref_lines=file_reader.readlines()
-    file_reader.close()
-
 
     if model_name=="DecompCompCNN":
         #Decomposition and Composition based CNN model
         print "Decomposition and Composition based CNN model started......"
-        run_wang_cnn_model(train_samples, dev_samples, dev_ref_lines, test_samples, test_ref_lines)
+        run_wang_cnn_model(train_samples)
 
 
 
