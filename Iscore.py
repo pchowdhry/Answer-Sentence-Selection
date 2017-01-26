@@ -4,7 +4,7 @@ import requests
 
 batch_size = 1
 word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
-best_wang_model_file = 'checkpoint-21-0.83.hdf5'
+best_wang_model_file = 'checkpoint-23-0.94.hdf5'
 word_vecs = load_word2vec(word_vec_file)
 best_wang_model = load_model(best_wang_model_file)
 import datetime
