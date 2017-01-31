@@ -32,14 +32,11 @@ def generate_kb():
    url = request.args.get('target')
    kb_name = request.args.get('kb_name')
    page = requests.get(url)
-   page = BeautifulSoup(page.content, 'html.parser')
-   for script in page.find_all("script"):
-    script.decompose()
-    text = tokenize_texts(page.get_text())
+   page = content_extractor.analyze(page.content)
+   text = tokenize_texts(page.decode('utf-8'))
    tt = []
-   s = 'menu'
    for t in text:
-       if t.endswith('.') and s not in t:
+       if t.endswith('.'):
            t = t.replace('\n', ' ')
            t = t.replace(':', ' ')
            t = t.replace('.', '')
@@ -47,8 +44,8 @@ def generate_kb():
            t = t.replace('(', '')
            t = t.replace(')', '')
            t = t.replace('-', ' ')
-           t = re.sub( '\s+', ' ', t ).strip()
-           t = re.sub('[^A-Za-z0-9]+', ' ', t)
+           t = t.sub( '\s+', ' ', t ).strip()
+           t = t.sub('[^A-Za-z0-9]+', ' ', t)
            #t.sub(r'\.([a-zA-Z])', r'. \1', t)
            if len(t) > 1:
                tt.append(t)
