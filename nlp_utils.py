@@ -1,18 +1,18 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals, print_function
 from flask import Flask
 from flask import request
 from spacy.en import English
 from io import BytesIO
-import datetime
-#import html
+from dragnet import content_extractor, content_comments_extractor
 import requests
-import re
 import json
-import os
-import sys
-import PyPDF2
-from bs4 import BeautifulSoup
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
+from cStringIO import StringIO
 import Iscore
 
 nlp = English()
@@ -23,20 +23,9 @@ app = Flask(__name__)
 def get_text():
    url = request.args.get('target')
    page = requests.get(url)
-   page = BeautifulSoup(page.content, 'html.parser')
-   for script in page.find_all("script"):
-    script.decompose()
-    text = tokenize_texts(page.get_text())
-   tt = []
-   s = 'menu'
-   for t in text:
-       if t.endswith('.') and s not in t:
-           t = t.replace('\n', ' ')
-           t = t.replace(':', ' ')
-           t = re.sub( '\s+', ' ', t ).strip()
-           #t.sub(r'\.([a-zA-Z])', r'. \1', t)
-           tt.append(t)
-   return json.dumps(tt)
+   page = content_extractor.analyze(page.content)
+   text = tokenize_texts(page.decode('utf-8'))
+   return json.dumps(text)
 
 @app.route('/generate_kb')
 def generate_kb():
@@ -75,16 +64,8 @@ def get_from_pdf():
     url = request.args.get('target')
     pdf = requests.get(url)
     memoryFile = BytesIO(pdf.content)
-    pdfReader = PyPDF2.PdfFileReader(memoryFile)
-    if pdfReader.isEncrypted:
-        pdfReader.decrypt('')
-    num_pages = pdfReader.getNumPages()
-    tt = ""
-    for i in range(num_pages):
-        pageObj = pdfReader.getPage(i)
-        t = pageObj.extractText()
-        t = (clean_string(t))
-        tt = tt + t
+    tt = convert_pdf_to_txt(memoryFile)
+    tt = clean_string(tt)
     tt = tokenize_texts(tt)
     return json.dumps(tt)
 
@@ -104,11 +85,31 @@ def get_answers():
 
 
 def clean_string(t):
+    t = t.decode("utf-8")
     t = t.replace('\n', ' ')
-    t = t.replace('¥!', ' ')
-    t = t.replace('¥', '')
     t = " ".join(t.split())
     return t
+
+def convert_pdf_to_txt(m_file):
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    codec = 'utf-8'
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    password = ""
+    maxpages = 0
+    caching = True
+    pagenos=set()
+
+    for page in PDFPage.get_pages(m_file, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=True):
+        interpreter.process_page(page)
+
+    text = retstr.getvalue()
+
+    device.close()
+    retstr.close()
+    return text
 
 if __name__ == '__main__':
     app.run(host= '0.0.0.0',port=8080, threaded=True)
