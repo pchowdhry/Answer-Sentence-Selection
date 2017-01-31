@@ -13,6 +13,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from cStringIO import StringIO
+from bs4 import BeautifulSoup
 import re
 import Iscore
 
@@ -33,11 +34,14 @@ def generate_kb():
    url = request.args.get('target')
    kb_name = request.args.get('kb_name')
    page = requests.get(url)
-   page = content_extractor.analyze(page.content)
-   text = tokenize_texts(page.decode('utf-8'))
+   page = BeautifulSoup(page.content, 'html.parser')
+   for script in page.find_all("script"):
+    script.decompose()
+    text = tokenize_texts(page.get_text())
    tt = []
+   s = 'menu'
    for t in text:
-       if t.endswith('.'):
+       if t.endswith('.') and s not in t:
            t = t.replace('\n', ' ')
            t = t.replace(':', ' ')
            t = t.replace('.', '')
@@ -45,9 +49,9 @@ def generate_kb():
            t = t.replace('(', '')
            t = t.replace(')', '')
            t = t.replace('-', ' ')
-           #t = t.sub( '\s+', ' ', t ).strip()
+           t = re.sub( '\s+', ' ', t ).strip()
            t = re.sub('[^A-Za-z0-9]+', ' ', t)
-           t = re.sub(r'\.([a-zA-Z])', r'. \1', t)
+           #t.sub(r'\.([a-zA-Z])', r'. \1', t)
            if len(t) > 1:
                tt.append(t)
        thefile = open("%s.txt" % kb_name, 'w' )
