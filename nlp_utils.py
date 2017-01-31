@@ -13,6 +13,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from cStringIO import StringIO
+import re
 import Iscore
 
 nlp = English()
@@ -44,9 +45,9 @@ def generate_kb():
            t = t.replace('(', '')
            t = t.replace(')', '')
            t = t.replace('-', ' ')
-           t = t.sub( '\s+', ' ', t ).strip()
-           t = t.sub('[^A-Za-z0-9]+', ' ', t)
-           #t.sub(r'\.([a-zA-Z])', r'. \1', t)
+           #t = t.sub( '\s+', ' ', t ).strip()
+           t = re.sub('[^A-Za-z0-9]+', ' ', t)
+           t = re.sub(r'\.([a-zA-Z])', r'. \1', t)
            if len(t) > 1:
                tt.append(t)
        thefile = open("%s.txt" % kb_name, 'w' )
