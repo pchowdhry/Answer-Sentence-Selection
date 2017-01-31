@@ -7,7 +7,9 @@ from collections import namedtuple
 from keras.models import load_model
 from scipy.spatial.distance import cdist
 import time
-os.environ["THEANO_FLAGS"] = "floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
+os.environ["THEANO_FLAGS"] = "device=gpu0,floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
+#os.environ["THEANO_FLAGS"] = "floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic,blas.ldflags=-L/usr/lib/ -lblas"
+#os.environ["THEANO_FLAGS"] = "floatX=float32,dnn.conv.algo_bwd_filter=deterministic,dnn.conv.algo_bwd_data=deterministic"
 
 batch_size = 100
 word_vec_file = 'data/GoogleNews-vectors-negative300.bin'
