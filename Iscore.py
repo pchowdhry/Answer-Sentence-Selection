@@ -236,3 +236,5 @@ def dynamic_score(file_name,question):
         print s[i][0][0], s[i][1][1]
         sorted_answers.append([str(s[i][0][0]), s[i][1][1]])
     return sorted_answers
+
+#end
